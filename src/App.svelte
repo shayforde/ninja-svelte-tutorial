@@ -1,52 +1,77 @@
 <script>
 	import Modal from './Modal.svelte';
+	import AddPersonForm from './AddPersonForm.svelte'
 
-
-	/*
-		https://www.youtube.com/watch?v=9PfCZFqYsYA&list=PL4cUxeGkcC9hlbrVO_2QFVqVPhlZmz7tO&index=8
-	*/
- let people = [
-    { name: 'yoshi', beltColour: 'black', age: 25, id: 1 },
-    { name: 'mario', beltColour: 'orange', age: 45, id: 2 },
-    { name: 'luigi', beltColour: 'black', age: 35, id: 3 }
-   ];
-
+	let showModal = false;
+	let toggleModal = () => {
+	  showModal = !showModal;
+	};
+	  let people = [
+	  { name: 'yoshi', beltColour: 'black', age: 25, id: 1 },
+	  { name: 'mario', beltColour: 'orange', age: 45, id: 2 },
+	  { name: 'luigi', beltColour: 'brown', age: 35, id: 3 }
+	];
 	const handleClick = (id) => {
-		people= people.filter(person=> person.id != id )
-	}
-	
-</script>
-<Modal />
-<div class="main">
+	  people = people.filter(person => person.id != id);
+	};
+
+	const addPerson = (e) => {
+		console.log(e.detail);
+		const person = e.detail;
+		people = [person, ...people];
+		showModal = false;
+
+	};
+  </script>
+  
+  <Modal {showModal} on:click={toggleModal}>
+	<AddPersonForm on:addPerson={addPerson}/>
+  </Modal>
+  <main>
+	<button on:click={toggleModal}>Open Modal</button>
+	{#each people as person (person.id)}
+	  <div class="mycard">
+		<h4>{person.name}</h4>
+		{#if person.beltColour === 'black'}
+		  <p><strong>MASTER NINJA</strong></p>
+		{/if}
+		<p>{person.age} years old, {person.beltColour} belt.</p>
+
+		{#if !person.skills}
+			{ person.skills=[] }
+		{/if}
 
 
-{#each people as person (person.id)}
-<div >
-  <h4>{person.name}</h4>
-  {#if person.beltColour === 'black'}
-	<p><strong>MASTER NINJA</strong></p>
-  {/if}
+		{#each person.skills as skill}
+			<div>{skill}</div>
+		{/each}
+		<button on:click={(e) => handleClick(e, person.id)}>delete</button>
+	  </div>
+	{:else}
+	  <p>There are no people to show...</p>
+	{/each}
+  </main>
+  
+  <style>
+	  main {
+		  text-align: center;
+		  padding: 1em;
+		  max-width: 240px;
+		  margin: 0 auto;
+	  }
+	  @media (min-width: 640px) {
+		  main {
+			  max-width: none;
+		  }
+	  }
 
-  <p>{person.age} years old,<span > {person.beltColour} </span>belt.</p>
-  <button on:click={()=>handleClick(person.id)}>delete</button>
-</div>
-{:else}
-<p>There are no people to show...</p>
-{/each}
-</div>
-
-<style>
-	
-		.main {
-			
-			text-align: center;
-		}
-		h1 {
-			color: #ff3e00;
-			text-transform: uppercase;
-			font-size: 4em;
-			font-weight: 100;
-		}
-	
-
-</style>
+	  .mycard {
+		background: #ccc;
+		border-radius: 10px;
+		padding: 5px 5px 5px 5px;
+		width: 75%;
+		margin: auto;
+		border-color: #aaa;
+		border-style: solid;
+	  }
+  </style>
